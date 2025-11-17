@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star Client V2 — Modern Bloxd.io Suite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #05060c;
+      --card: rgba(12, 14, 25, 0.82);
+      --muted: rgba(255,255,255,0.65);
+      --accent: #ff7b39;
+      --accent-soft: rgba(255, 123, 57, 0.2);
+      --text: #f4f7ff;
+      --mono: 'JetBrains Mono', monospace;
+      --display: 'Space Grotesk', 'Inter', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--display);
+      background: radial-gradient(circle at top, #090d1b 0%, #05060c 60%);
+      min-height: 100vh;
+      color: var(--text);
+      line-height: 1.6;
+      scroll-behavior: smooth;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+    section { padding: clamp(4rem, 10vw, 7rem) clamp(1.5rem, 8vw, 5rem); }
+
+    .site-header {
+      position: relative;
+      padding: clamp(2rem, 6vw, 4rem) clamp(1.5rem, 8vw, 5rem) 4rem;
+      overflow: hidden;
+    }
+    .site-header .glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 0% 0%, rgba(255, 123, 57, 0.3), transparent 55%),
+                  radial-gradient(circle at 80% 0%, rgba(105, 87, 255, 0.25), transparent 50%);
+      pointer-events: none;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .nav ul { display: flex; gap: 1.5rem; font-size: 0.95rem; }
+    .nav a { color: var(--muted); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+    .nav a:hover { color: var(--text); }
+    .logo { font-weight: 700; font-size: 1.15rem; letter-spacing: 0.2em; }
+    .logo span { color: var(--accent); }
+
+    .btn {
+      padding: 0.85rem 1.6rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn.primary { background: linear-gradient(120deg, #ff9b45, #ff6b9c); color: #0a0508; }
+    .btn.ghost { border-color: rgba(255,255,255,0.25); color: var(--text); background: transparent; }
+    .btn.ghost:hover { border-color: var(--text); }
+
+    .hero {
+      margin-top: clamp(2rem, 8vw, 5rem);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: clamp(2rem, 4vw, 5rem);
+      position: relative;
+      z-index: 1;
+    }
+    .hero-copy h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 1rem; }
+    .hero-copy .lead { max-width: 32rem; color: var(--muted); margin-bottom: 1.75rem; }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .hero-tags { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .hero-tags span { border: 1px solid rgba(255,255,255,0.15); border-radius: 999px; padding: 0.35rem 1rem; font-size: 0.85rem; color: var(--muted); }
+    .eyebrow { text-transform: uppercase; letter-spacing: 0.25em; font-size: 0.9rem; color: var(--muted); margin-bottom: 0.6rem; }
+
+    .hero-panel {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 32px;
+      padding: 1.75rem;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.45);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .panel-head { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 0.85rem; color: var(--muted); }
+    .panel-head .status { color: #52ffa8; }
+    .panel-body .stat { margin-bottom: 1rem; }
+    .panel-body .stat strong { font-size: 1.2rem; display: block; }
+    .panel-body .progress { height: 8px; border-radius: 999px; background: rgba(255,255,255,0.08); margin-top: 0.6rem; overflow: hidden; }
+    .panel-body .progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(120deg, #ff9b45, #ff6b9c); }
+    .panel-body .stat.compact { display: flex; gap: 1.5rem; font-family: var(--mono); font-size: 0.85rem; }
+    .panel-foot { font-size: 0.8rem; color: var(--muted); font-family: var(--mono); }
+
+    .section-head { margin-bottom: 2.5rem; max-width: 640px; }
+    .section-head p { color: var(--muted); }
+    .section-head h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 0.5rem; }
+
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.5rem; }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 1.75rem;
+      border-radius: 24px;
+      min-height: 180px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      border: 1px solid rgba(255,255,255,0.04);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .card:hover::after { opacity: 1; }
+    .card h3 { margin-bottom: 0.8rem; }
+    .card p { color: var(--muted); font-size: 0.95rem; }
+
+    .modules { background: rgba(4,5,10,0.6); }
+    .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .module {
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 1.4rem;
+      background: rgba(10,10,25,0.65);
+    }
+    .module h4 { margin-bottom: 0.6rem; }
+    .module p { color: var(--muted); font-size: 0.9rem; }
+
+    .highlight { text-align: center; position: relative; }
+    .mockup { margin-top: 3rem; display: flex; justify-content: center; }
+    .mockup-inner {
+      width: min(680px, 90%);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 32px;
+      padding: 2rem;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.45);
+    }
+    .mockup-inner .chip { font-family: var(--mono); color: #6cffc2; margin-bottom: 1rem; text-align: left; }
+    .mockup-body { display: flex; justify-content: space-between; gap: 2rem; text-align: left; flex-wrap: wrap; }
+    .mockup .label { font-size: 0.9rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 0.6rem; }
+    .mockup ul { color: var(--muted); }
+
+    .steps { background: rgba(8,9,16,0.9); }
+    .step-list { counter-reset: step; display: flex; flex-direction: column; gap: 1.5rem; }
+    .step-list li { display: flex; gap: 1.5rem; align-items: flex-start; }
+    .step-num {
+      font-family: var(--mono);
+      color: var(--accent);
+      border: 1px solid var(--accent-soft);
+      border-radius: 12px;
+      padding: 0.5rem 0.9rem;
+      font-size: 0.9rem;
+    }
+
+    .cta { background: radial-gradient(circle at center, rgba(255, 123, 57, 0.12), rgba(5,6,12,0.95)); }
+    .cta-card {
+      background: rgba(9,10,20,0.9);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 32px;
+      padding: clamp(2rem, 6vw, 3rem);
+      text-align: center;
+    }
+    .cta-actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin: 1rem 0 1.5rem; }
+    .tiny { font-size: 0.85rem; color: var(--muted); }
+
+    .faq { background: rgba(5,6,12,0.85); }
+    .faq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; }
+    .faq article { border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 1.5rem; background: rgba(8,8,18,0.65); }
+    .faq article h3 { margin-bottom: 0.6rem; font-size: 1.1rem; }
+    .faq article p { color: var(--muted); }
+
+    .site-footer { padding: 2rem; text-align: center; font-size: 0.85rem; color: var(--muted); border-top: 1px solid rgba(255,255,255,0.08); }
+    .site-footer a { color: var(--accent); }
+
+    @media (max-width: 720px) {
+      .nav ul { display: none; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-panel { order: -1; }
+      .hero-actions { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header" id="top">
+    <div class="glow"></div>
+    <nav class="nav">
+      <div class="logo">Star Client<span>V2</span></div>
+      <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#modules">Modules</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <a class="btn ghost" href="#download">Download</a>
+    </nav>
+    <div class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Bloxd.io enhancement suite</p>
+        <h1>Modern UI, live theming, advanced combat tools & a real minimap.</h1>
+        <p class="lead">Star Client V2 bundles TargetHUD, FightBot, Triggerbot, Minimap, QoL HUDs and persistent settings in a single sleek overlay.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#download">Download Client</a>
+          <a class="btn ghost" href="#modules">Explore Modules</a>
+        </div>
+        <div class="hero-tags">
+          <span>Glassmorphic UI</span>
+          <span>Tampermonkey Script</span>
+          <span>Owner Console</span>
+        </div>
+      </div>
+      <div class="hero-panel">
+        <div class="panel-head">
+          <span>Target HUD · Live data</span>
+          <span class="status">INJECTED</span>
+        </div>
+        <div class="panel-body">
+          <div class="stat">
+            <small>Current Target</small>
+            <strong>MinerMax_08</strong>
+            <span>2.4 blocks · 73% HP</span>
+          </div>
+          <div class="stat">
+            <small>Profile Level</small>
+            <strong>16 · PvPer</strong>
+            <div class="progress">
+              <span style="width:72%"></span>
+            </div>
+          </div>
+          <div class="stat compact">
+            <div>
+              <small>Killaura</small>
+              <strong>Enabled</strong>
+            </div>
+            <div>
+              <small>FightBot</small>
+              <strong>Humanized</strong>
+            </div>
+          </div>
+          <p class="panel-foot">Customizable binds · Panic switch · Daily XP rewards</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="features" class="section">
+      <div class="section-head">
+        <p class="eyebrow">Experience upgrades</p>
+        <h2>Why players pick Star Client</h2>
+        <p>Everything is tuned for fluid combat, awareness and style.</p>
+      </div>
+      <div class="card-grid">
+        <article class="card">
+          <h3>TargetHUD + Profile</h3>
+          <p>Draggable HUD shows enemy stats, distance, health animation and your profile progression with daily XP claims.</p>
+        </article>
+        <article class="card">
+          <h3>FightBot 2.0</h3>
+          <p>Adaptive combat style, predictive targeting, strafing logic, panic mode retreating and optional auto-move.</p>
+        </article>
+        <article class="card">
+          <h3>Real Minimap</h3>
+          <p>Scans Bloxd terrain in realtime, paints block heights, draws players, names and facing direction.</p>
+        </article>
+        <article class="card">
+          <h3>Glass UI & Themes</h3>
+          <p>Live accent swapping, draggable panels, resizable layout and persistent settings synced via local storage.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="modules" class="section modules">
+      <div class="section-head">
+        <p class="eyebrow">Toolkit</p>
+        <h2>Core modules, at a glance</h2>
+      </div>
+      <div class="module-grid">
+        <div class="module">
+          <h4>Killaura</h4>
+          <p>Custom CPS window, FOV, smooth aim, LOS checks, friend ignore list.</p>
+        </div>
+        <div class="module">
+          <h4>Triggerbot</h4>
+          <p>Auto hits once crosshair is on valid targets, perfect for bows.</p>
+        </div>
+        <div class="module">
+          <h4>FightBot</h4>
+          <p>Humanized rotations, strafing radius, sprint control, arrow dodging.</p>
+        </div>
+        <div class="module">
+          <h4>Auto Sprint / Jump</h4>
+          <p>Movement QoL toggles with adjustable speed multiplier.</p>
+        </div>
+        <div class="module">
+          <h4>HUD Suite</h4>
+          <p>Watermark, array list, coords HUD, owner console for level grants.</p>
+        </div>
+        <div class="module">
+          <h4>Minimap</h4>
+          <p>Resizable widget, opacity slider, position locking and friend colors.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section highlight" id="showcase">
+      <div class="section-head">
+        <p class="eyebrow">Showcase</p>
+        <h2>Minimal, cinematic overlay</h2>
+        <p>Inspired by glass dashboards. Works on any Bloxd.io mode after Tampermonkey injection.</p>
+      </div>
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="chip">Modules: 6</div>
+          <div class="mockup-body">
+            <div>
+              <p class="label">Quick Toggles</p>
+              <ul>
+                <li>Killaura</li>
+                <li>Minimap</li>
+                <li>Panic</li>
+              </ul>
+            </div>
+            <div>
+              <p class="label">Status</p>
+              <p>Injected · Players nearby: 8</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="install" class="section steps">
+      <div class="section-head">
+        <p class="eyebrow">Installation</p>
+        <h2>3 steps to run Star Client</h2>
+      </div>
+      <ol class="step-list">
+        <li>
+          <span class="step-num">01</span>
+          <div>
+            <h3>Install Tampermonkey</h3>
+            <p>Available for Chrome, Edge, Firefox. Enable the extension.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">02</span>
+          <div>
+            <h3>Import the userscript</h3>
+            <p>Open the Star Client script, click “Install”, then allow updates.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">03</span>
+          <div>
+            <h3>Join Bloxd.io</h3>
+            <p>The GUI pops up with <kbd>SHIFT</kbd> + <kbd>RIGHT</kbd>. Configure binds & enjoy.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section id="download" class="section cta">
+      <div class="cta-card">
+        <h2>Ready to power up?</h2>
+        <p>Download the latest Star Client V2 build, review the changelog and start stacking wins.</p>
+        <div class="cta-actions">
+          <a class="btn primary" href="https://github.com/yourname/star-client/releases/latest" target="_blank" rel="noreferrer">Download Script</a>
+          <a class="btn ghost" href="https://github.com/yourname/star-client" target="_blank" rel="noreferrer">View Source</a>
+        </div>
+        <span class="tiny">Requires Tampermonkey · Works on Bloxd.io desktop browsers.</span>
+      </div>
+    </section>
+
+    <section id="faq" class="section faq">
+      <div class="section-head">
+        <p class="eyebrow">Need answers?</p>
+        <h2>FAQ</h2>
+      </div>
+      <div class="faq-grid">
+        <article>
+          <h3>Is Star Client bannable?</h3>
+          <p>Use at your own risk. We recommend private lobbies or alt accounts.</p>
+        </article>
+        <article>
+          <h3>Does it auto update?</h3>
+          <p>Yes. Tampermonkey pulls the script from GitHub, so you always run the latest build.</p>
+        </article>
+        <article>
+          <h3>How to change keybinds?</h3>
+          <p>Open the GUI, head to “Settings → Keybinds” and capture new keys per module.</p>
+        </article>
+        <article>
+          <h3>Support?</h3>
+          <p>Reach out via Discord <strong>@StarClient</strong> or open an issue on GitHub.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Star Client V2 is an independent Bloxd.io enhancement suite. Not affiliated with Bloxd.io.</p>
+    <a href="#top">Back to top ↑</a>
+  </footer>
+
+  <script>
+    const nav = document.querySelector('.nav ul');
+    const navToggle = document.createElement('button');
+    navToggle.className = 'btn ghost';
+    navToggle.textContent = 'Menu';
+    navToggle.style.display = 'none';
+    navToggle.type = 'button';
+
+    function syncMenuVisibility() {
+      if (!nav) return;
+      if (window.innerWidth <= 720) {
+        navToggle.style.display = 'inline-flex';
+        nav?.classList.add('collapsed');
+        nav.style.display = 'none';
+      } else {
+        navToggle.style.display = 'none';
+        nav.style.display = 'flex';
+      }
+    }
+
+    navToggle.addEventListener('click', () => {
+      if (!nav) return;
+      const isHidden = nav.style.display === 'none';
+      nav.style.display = isHidden ? 'flex' : 'none';
+    });
+
+    window.addEventListener('resize', syncMenuVisibility);
+    syncMenuVisibility();
+
+    const navContainer = document.querySelector('.nav');
+    if (navContainer) navContainer.appendChild(navToggle);
+
+    const links = document.querySelectorAll('a[href^="#"]');
+    links.forEach(link => {
+      link.addEventListener('click', e => {
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
